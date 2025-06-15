@@ -2,7 +2,7 @@
   "name": "Story Map App",
   "short_name": "Story Map",
   "description": "Aplikasi untuk berbagi cerita dengan lokasi di peta.",
-  "start_url": "/",
+  "start_url": "/storyApps/",
   "display": "standalone",
   "background_color": "#eef2f7",
   "theme_color": "#007bff",
