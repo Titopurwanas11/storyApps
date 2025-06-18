@@ -1,41 +1,40 @@
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/assets/icons/marker-icon-2x.webp', // Jalur relatif ke folder dist/
-  iconUrl: '/assets/icons/marker-icon.webp',         // Jalur relatif ke folder dist/
-  shadowUrl: '/assets/icons/marker-shadow.webp',     // Jalur relatif ke folder dist/
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN DI SINI
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp',         // <-- PERBAIKAN DI SINI
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',     // <-- PERBAIKAN DI SINI
 });
 
 const appCustomMarkerIcon = L.icon({
-  iconUrl: '/assets/icons/marker-icon.webp',
-  iconRetinaUrl: '/assets/icons/marker-icon-2x.webp',
-  iconSize: [32, 41],
-  iconAnchor: [16, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: '/assets/icons/marker-shadow.webp',
-  shadowSize: [41, 41]
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp', // <-- PERBAIKAN DI SINI
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN DI SINI
+  iconSize: [32, 41],
+  iconAnchor: [16, 41],
+  popupAnchor: [1, -34],
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp', // <-- PERBAIKAN DI SINI
+  shadowSize: [41, 41]
 });
 
 
-
 const MAP_CONFIG = {
-  preferCanvas: true,
-  fadeAnimation: false,
-  zoomSnap: 0.5,
-  wheelPxPerZoomLevel: 60,
-  inertia: true,
-  inertiaDeceleration: 3000
+  preferCanvas: true,
+  fadeAnimation: false,
+  zoomSnap: 0.5,
+  wheelPxPerZoomLevel: 60,
+  inertia: true,
+  inertiaDeceleration: 3000
 };
 
 // Konfigurasi Tile Layer
 const TILE_CONFIG = {
-  maxZoom: 19,
-  minZoom: 3,
-  reuseTiles: true,
-  updateWhenIdle: true,
-  crossOrigin: true,
-  detectRetina: true,
-  errorTileUrl: '/assets/images/map-error.webp' // Fallback tile
+  maxZoom: 19,
+  minZoom: 3,
+  reuseTiles: true,
+  updateWhenIdle: true,
+  crossOrigin: true,
+  detectRetina: true,
+  errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN DI SINI
 };
 
 // Konfigurasi Marker Cluster
