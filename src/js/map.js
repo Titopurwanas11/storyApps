@@ -1,18 +1,18 @@
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // Jalur relatif ke folder dist/
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',         // Jalur relatif ke folder dist/
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',     // Jalur relatif ke folder dist/
+  iconRetinaUrl: '/assets/icons/marker-icon-2x.webp', // Jalur relatif ke folder dist/
+  iconUrl: '/assets/icons/marker-icon.webp',         // Jalur relatif ke folder dist/
+  shadowUrl: '/assets/icons/marker-shadow.webp',     // Jalur relatif ke folder dist/
 });
 
 const appCustomMarkerIcon = L.icon({
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp',
+  iconUrl: '/assets/icons/marker-icon.webp',
+  iconRetinaUrl: '/assets/icons/marker-icon-2x.webp',
   iconSize: [32, 41],
   iconAnchor: [16, 41],
   popupAnchor: [1, -34],
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',
+  shadowUrl: '/assets/icons/marker-shadow.webp',
   shadowSize: [41, 41]
 });
 
@@ -35,7 +35,7 @@ const TILE_CONFIG = {
   updateWhenIdle: true,
   crossOrigin: true,
   detectRetina: true,
-  errorTileUrl: '/storyApps/assets/images/map-error.webp' // Fallback tile
+  errorTileUrl: '/assets/images/map-error.webp' // Fallback tile
 };
 
 // Konfigurasi Marker Cluster
@@ -104,7 +104,7 @@ export const renderMarkers = (map, stories = []) => {
     const popupContent = `
       <div class="popup-content">
         <h3>${story.name}</h3>
-        <img src="/storyApps/assets/images/placeholder.webp"
+        <img src="/assets/images/placeholder.webp"
              data-src="${story.photoUrl}"
              alt="${story.description || 'Story image'}"
              loading="lazy"

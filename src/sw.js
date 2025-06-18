@@ -1,72 +1,40 @@
-const CACHE_VERSION = 'v3';
-const CORE_CACHE = `core-${CACHE_VERSION}`;
+import { precacheAndRoute } from 'workbox-precaching'; // <-- PERBAIKAN: Import precacheAndRoute
+
+const CACHE_VERSION = 'v3'; // Ini bisa dipertahankan, atau biarkan Workbox yang mengatur versi
+const CORE_CACHE = `core-${CACHE_VERSION}`; // Ini mungkin tidak lagi dipakai langsung oleh Workbox precaching
 const MAP_CACHE = `map-${CACHE_VERSION}`;
 const ASSET_CACHE = `asset-${CACHE_VERSION}`;
 
-// Critical Assets - Sesuaikan dengan output Webpack
-const CORE_ASSETS = [
-    '/storyApps/',                 // <-- PERBAIKAN: root URL dengan repository name
-    '/storyApps/index.html',
-    '/storyApps/js/app.bundle.js',
-    '/storyApps/offline.html',
-    '/storyApps/manifest.json',    // <-- PERBAIKAN: manifest.json path
-    '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN: icon paths
-    '/storyApps/assets/icons/android-chrome-512x512.png',
-    '/storyApps/assets/icons/apple-touch-icon.png',
-    '/storyApps/assets/icons/favicon-16x16.png',
-    '/storyApps/assets/icons/favicon-32x32.png',
-    '/storyApps/assets/icons/favicon.ico', // Jika Anda punya dan ingin di-cache
-];
-
-// Map Resources - Ini tetap sama untuk CDN, tapi errorTileUrl harus diperbaiki
+// Map Resources - Ini tetap sama karena dari CDN
 const MAP_RESOURCES = [
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js',
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  // --- PERBAIKAN: errorTileUrl jika itu aset lokal ---
-  '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN: tambahkan /storyApps/
+  'https://unpkg.com/leaflet.lazyload@1.0.0/Leaflet.LazyLoad.min.js', // Tambahkan ini jika Anda menggunakannya
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 ];
+
+precacheAndRoute(self.__WB_MANIFEST);
+// --- AKHIR PERBAIKAN ---
 // Install Event - Cache Core Assets
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CORE_CACHE)
-      .then(cache => {
-        console.log('Caching core assets:', CORE_ASSETS);
-        return cache.addAll(CORE_ASSETS);
-      })
-      .then(() => self.skipWaiting())
-      .catch(error => {
-        console.error('Service Worker install failed (addAll error):', error);
-        console.error('Failed to cache the following core assets:');
-
-        Promise.allSettled(CORE_ASSETS.map(url =>
-            fetch(url, { cache: 'no-store' })
-        ))
-        .then(results => {
-            results.forEach((result, index) => {
-                const url = CORE_ASSETS[index];
-                if (result.status === 'rejected') {
-                    console.error(`- URL: ${url} (Network Error):`, result.reason);
-                } else if (result.value && !result.value.ok) {
-                    console.error(`- URL: ${url} (HTTP Error):`, result.value.status, result.value.statusText);
-                }
-            });
-        })
-        .finally(() => {
-            console.warn('Diagnosis fetch aset individual selesai. Periksa error spesifik di atas.');
-        });
-      })
-  );
+  console.log('Service Worker: Installing...');
+  // precacheAndRoute(self.__WB_MANIFEST) sudah menangani caching di fase install
+  event.waitUntil(self.skipWaiting()); // Tetap ada untuk mengaktifkan SW baru segera
 });
 
-// Activate Event - Clean Old Caches
+
+// Activate Event - Clean Old Caches (Pertahankan, tapi sesuaikan nama cache jika CORE_CACHE tidak dipakai lagi)
 self.addEventListener('activate', (event) => {
+  console.log('Service Worker: Activating...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
-          if (cache !== CORE_CACHE && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
+          // Hapus cache lama, kecuali cache yang dikelola Workbox (misal: "google-fonts", dll.)
+          // Workbox biasanya menggunakan nama cache seperti 'workbox-precache-XXXX' atau 'google-fonts'
+          // Hati-hati dengan nama cache yang dibuat Workbox
+          if (!cache.startsWith('workbox-precache') && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
             console.log('Deleting old cache:', cache);
             return caches.delete(cache);
           }
@@ -77,15 +45,15 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+
 // Fetch Event - Advanced Caching Strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // Cache Map Resources with Cache First
+  // Cache Map Resources with Cache First (tetap)
   if (MAP_RESOURCES.some(resource => request.url.includes(resource))) {
     event.respondWith(
       caches.match(request)
@@ -94,26 +62,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache API responses with Network First
+  // Cache API responses with Network First (tetap)
   if (url.pathname.startsWith('/stories')) {
     event.respondWith(
       networkFirstWithCache(request, ASSET_CACHE)
     );
     return;
   }
-
-  // For Core Assets: Cache First
-  if (CORE_ASSETS.includes(url.pathname)) {
-    event.respondWith(
-      caches.match(request)
-        .then(cached => cached || fetch(request))
-    );
-    return;
-  }
-
-  // For everything else: Network First with Offline Fallback
   event.respondWith(
-    networkFirstWithCache(request, ASSET_CACHE)
+    networkFirstWithCache(request, ASSET_CACHE) // Ini akan mencakup aset precached jika belum ada di cache utama
       .catch(() => offlineFallback())
   );
 });
@@ -124,10 +81,9 @@ self.addEventListener('push', (event) => {
     title: 'New Story',
     options: {
       body: 'A new story has been shared',
-      icon: '/assets/icons/android-chrome-192x192.png',
+      icon: '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN: Tambahkan /storyApps/
     }
   };
-
   event.waitUntil(
     self.registration.showNotification(payload.title, payload.options)
   );
@@ -142,7 +98,7 @@ self.addEventListener('notificationclick', (event) => {
         if (clients.length) {
           return clients[0].focus();
         }
-        return self.clients.openWindow('/');
+        return self.clients.openWindow('/storyApps/'); // <-- PERBAIKAN: Tambahkan /storyApps/
       })
   );
 });
