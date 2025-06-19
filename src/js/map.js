@@ -1,3 +1,5 @@
+// src/js/map.js
+
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
