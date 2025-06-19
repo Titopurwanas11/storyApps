@@ -63,6 +63,12 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // --- PERBAIKAN DI SINI: Lewati request dari ekstensi browser ---
+  if (url.protocol === 'chrome-extension:') {
+    return; // Biarkan browser menangani request ini, jangan diintersep oleh Service Worker
+  }
+  // --- AKHIR PERBAIKAN ---
+
   if (request.method !== 'GET') return;
 
   // Cache Map Resources with Cache First (tetap)
@@ -75,7 +81,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Cache API responses with Network First
-  if (url.pathname.startsWith('/stories')) { // Ini endpoint API, tetap /stories
+  if (url.pathname.startsWith('/stories')) {
     event.respondWith(
       networkFirstWithCache(request, ASSET_CACHE)
     );
