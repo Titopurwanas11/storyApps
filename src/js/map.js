@@ -3,18 +3,18 @@
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp',
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp',         // <-- PERBAIKAN
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',     // <-- PERBAIKAN
 });
 
 const appCustomMarkerIcon = L.icon({
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp',
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp', // <-- PERBAIKAN
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
   iconSize: [32, 41],
   iconAnchor: [16, 41],
   popupAnchor: [1, -34],
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp', // <-- PERBAIKAN
   shadowSize: [41, 41]
 });
 
@@ -36,20 +36,8 @@ const TILE_CONFIG = {
   updateWhenIdle: true,
   crossOrigin: true,
   detectRetina: true,
-  errorTileUrl: '/storyApps/assets/images/map-error.webp'
+  errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN
 };
-
-// --- PERBAIKAN: Definisikan dan Export CLUSTER_CONFIG di level module ---
-export const CLUSTER_CONFIG = { // <--- DEFINISI DI SINI DAN DI-EXPORT
-  spiderfyOnMaxZoom: true,
-  showCoverageOnHover: false,
-  zoomToBoundsOnClick: true,
-  chunkedLoading: true,
-  chunkInterval: 100,
-  disableClusteringAtZoom: 17
-};
-// --- AKHIR PERBAIKAN ---
-
 
 // Inisialisasi Peta
 export const initMap = (containerId, center = [-2.5489, 118.0149], zoom = 4) => {
@@ -62,15 +50,18 @@ export const initMap = (containerId, center = [-2.5489, 118.0149], zoom = 4) => 
 
   const map = L.map(container, MAP_CONFIG).setView(center, zoom);
 
+  // Tambahkan base layer
   const baseLayer = L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     TILE_CONFIG
   ).addTo(map);
 
+  // Handle error tile
   baseLayer.on('tileerror', (e) => {
     console.error('Error loading tile:', e.tile.src);
   });
 
+  // Simpan referensi peta di container
   container._map = map;
   return map;
 };
@@ -83,8 +74,19 @@ export const renderMarkers = (map, stories = []) => {
     map.removeLayer(map._markerCluster);
   }
 
+  // --- PERBAIKAN: Pindahkan definisi CLUSTER_CONFIG ke SINI (ke dalam fungsi) ---
+  const CLUSTER_CONFIG = { // <--- DEFINISI DIPINDAHKAN KE DALAM FUNGSI INI
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    chunkedLoading: true,
+    chunkInterval: 100,
+    disableClusteringAtZoom: 17
+  };
+  // --- AKHIR PERBAIKAN ---
+
   // Buat marker cluster group
-  const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG); // Sekarang CLUSTER_CONFIG pasti terdefinisi
+  const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG);
 
   // Tambahkan marker untuk setiap story
   stories.forEach(story => {
@@ -160,7 +162,7 @@ export const setupMapClickHandler = (map, callback) => {
   
     // Tambahkan marker baru
     marker = L.marker([lat, lng], {
-      icon: appCustomMarkerIcon,
+      icon: appCustomMarkerIcon, // <--- GUNAKAN IKON GLOBAL DI SINI!
       draggable: true,
       title: 'Lokasi dipilih',
       alt: `Lokasi story ${story.name}`,
@@ -200,7 +202,7 @@ export const locateUser = (map) => {
       .on('locationfound', (e) => {
         const { lat, lng } = e.latlng;
         L.marker([lat, lng], {
-          icon: appCustomMarkerIcon,
+          icon: appCustomMarkerIcon, // <-- Tambahkan ikon ini juga untuk marker lokasi user
           title: 'Lokasi Anda',
           alt: 'Marker lokasi user'
         }).addTo(map)

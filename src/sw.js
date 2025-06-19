@@ -1,3 +1,5 @@
+// src/sw.js
+
 import { precacheAndRoute } from 'workbox-precaching';
 
 const CACHE_VERSION = 'v3';
