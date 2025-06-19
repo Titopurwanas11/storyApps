@@ -1,18 +1,18 @@
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',         // <-- PERBAIKAN
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',     // <-- PERBAIKAN
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp',
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp',
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',
 });
 
 const appCustomMarkerIcon = L.icon({
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp', // <-- PERBAIKAN
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp',
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp',
   iconSize: [32, 41],
   iconAnchor: [16, 41],
   popupAnchor: [1, -34],
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp', // <-- PERBAIKAN
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',
   shadowSize: [41, 41]
 });
 
@@ -34,33 +34,33 @@ const TILE_CONFIG = {
   updateWhenIdle: true,
   crossOrigin: true,
   detectRetina: true,
-  errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN
+  errorTileUrl: '/storyApps/assets/images/map-error.webp'
 };
+
+// --- PERBAIKAN: Hapus definisi CLUSTER_CONFIG dari sini ---
+// const CLUSTER_CONFIG = { ... }; // HAPUS INI
+// --- AKHIR PERBAIKAN ---
 
 // Inisialisasi Peta
 export const initMap = (containerId, center = [-2.5489, 118.0149], zoom = 4) => {
   const container = document.getElementById(containerId);
   if (!container) return null;
 
-  // Hapus instance peta sebelumnya jika ada
   if (container._map) {
     container._map.remove();
   }
 
   const map = L.map(container, MAP_CONFIG).setView(center, zoom);
 
-  // Tambahkan base layer
   const baseLayer = L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     TILE_CONFIG
   ).addTo(map);
 
-  // Handle error tile
   baseLayer.on('tileerror', (e) => {
     console.error('Error loading tile:', e.tile.src);
   });
 
-  // Simpan referensi peta di container
   container._map = map;
   return map;
 };
@@ -73,6 +73,17 @@ export const renderMarkers = (map, stories = []) => {
   if (map._markerCluster) {
     map.removeLayer(map._markerCluster);
   }
+
+  // --- PERBAIKAN: Pindahkan definisi CLUSTER_CONFIG ke sini ---
+  const CLUSTER_CONFIG = { // <--- DEFINISI DIPINDAHKAN KE DALAM FUNGSI INI
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    chunkedLoading: true,
+    chunkInterval: 100,
+    disableClusteringAtZoom: 17
+  };
+  // --- AKHIR PERBAIKAN ---
 
   // Buat marker cluster group
   const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG);
