@@ -1,20 +1,18 @@
-// src/js/map.js
-
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN DI SINI
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',         // <-- PERBAIKAN DI SINI
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',     // <-- PERBAIKAN DI SINI
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp',         // <-- PERBAIKAN
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',     // <-- PERBAIKAN
 });
 
 const appCustomMarkerIcon = L.icon({
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp', // <-- PERBAIKAN DI SINI
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN DI SINI
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp', // <-- PERBAIKAN
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
   iconSize: [32, 41],
   iconAnchor: [16, 41],
   popupAnchor: [1, -34],
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp', // <-- PERBAIKAN DI SINI
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp', // <-- PERBAIKAN
   shadowSize: [41, 41]
 });
 
@@ -36,7 +34,7 @@ const TILE_CONFIG = {
   updateWhenIdle: true,
   crossOrigin: true,
   detectRetina: true,
-  errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN DI SINI
+  errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN
 };
 
 // Inisialisasi Peta
@@ -92,20 +90,20 @@ export const renderMarkers = (map, stories = []) => {
     });
 
     // Popup content dengan lazy loading image
-     const popupContent = `
-      <div class="popup-content">
-        <h3>${story.name}</h3>  <-- PERBAIKAN: Pastikan ini adalah template literal yang benar
-        <img src="/storyApps/assets/images/placeholder.webp"  
-             data-src="${story.photoUrl}"  <-- PERBAIKAN: Pastikan ini adalah template literal yang benar
-             alt="${story.description || 'Story image'}" <-- PERBAIKAN: Pastikan ini adalah template literal yang benar
-             loading="lazy"
-             class="story-image"
-             width="200"
-             height="150">
-        <p>${story.description}</p> <-- PERBAIKAN: Pastikan ini adalah template literal yang benar
-        <small>${new Date(story.createdAt).toLocaleDateString()}</small>
-      </div>
-    `;
+    const popupContent = `
+      <div class="popup-content">
+        <h3><span class="math-inline">\{story\.name\}</h3\>
+<img src\="/storyApps/assets/images/placeholder\.webp"
+data\-src\="</span>{story.photoUrl}"
+             alt="<span class="math-inline">\{story\.description \|\| 'Story image'\}"
+loading\="lazy"
+class\="story\-image"
+width\="200"
+height\="150"\>
+<p\></span>{story.description}</p>
+        <small>${new Date(story.createdAt).toLocaleDateString()}</small>
+      </div>
+    `;
 
     marker.bindPopup(popupContent, {
       maxWidth: 300,

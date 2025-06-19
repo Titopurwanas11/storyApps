@@ -1,3 +1,5 @@
+import { precacheAndRoute } from 'workbox-precaching';
+
 const CACHE_VERSION = 'v3';
 const CORE_CACHE = `core-${CACHE_VERSION}`;
 const MAP_CACHE = `map-${CACHE_VERSION}`;
@@ -5,62 +7,38 @@ const ASSET_CACHE = `asset-${CACHE_VERSION}`;
 
 // Critical Assets - Sesuaikan dengan output Webpack
 const CORE_ASSETS = [
-    '/storyApps/',                 // <-- PERBAIKAN: root URL dengan repository name
-    '/storyApps/index.html',
-    '/storyApps/js/app.bundle.js',
-    '/storyApps/offline.html',
-    '/storyApps/manifest.json',    // <-- PERBAIKAN: manifest.json path
-    '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN: icon paths
-    '/storyApps/assets/icons/android-chrome-512x512.png',
-    '/storyApps/assets/icons/apple-touch-icon.png',
-    '/storyApps/assets/icons/favicon-16x16.png',
-    '/storyApps/assets/icons/favicon-32x32.png',
-    '/storyApps/assets/icons/favicon.ico', // Jika Anda punya dan ingin di-cache
+    '/storyApps/',                 // <-- PERBAIKAN
+    '/storyApps/index.html',       // <-- PERBAIKAN
+    '/storyApps/js/app.bundle.js', // <-- PERBAIKAN
+    '/storyApps/offline.html',     // <-- PERBAIKAN
+    '/storyApps/manifest.json',    // <-- PERBAIKAN
+    // Ikon PWA (pastikan ini ada di src/assets/icons/ dan disalin oleh webpack)
+    '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN
+    '/storyApps/assets/icons/android-chrome-512x512.png', // <-- PERBAIKAN
+    '/storyApps/assets/icons/apple-touch-icon.png',       // <-- PERBAIKAN
+    '/storyApps/assets/icons/favicon-16x16.png',          // <-- PERBAIKAN
+    '/storyApps/assets/icons/favicon-32x32.png',          // <-- PERBAIKAN
+    '/storyApps/assets/icons/favicon.ico',                // <-- PERBAIKAN
 ];
 
-// Map Resources - Ini tetap sama untuk CDN, tapi errorTileUrl harus diperbaiki
+// Map Resources - CDN tetap sama, tapi errorTileUrl harus diperbaiki
 const MAP_RESOURCES = [
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js',
+  'https://unpkg.com/leaflet.lazyload@1.0.0/Leaflet.LazyLoad.min.js', // Tambahkan ini jika Anda menggunakannya
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  // --- PERBAIKAN: errorTileUrl jika itu aset lokal ---
-  '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN: tambahkan /storyApps/
+  '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN
 ];
 
 precacheAndRoute(self.__WB_MANIFEST);
+
 // Install Event - Cache Core Assets
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CORE_CACHE)
-      .then(cache => {
-        console.log('Caching core assets:', CORE_ASSETS);
-        return cache.addAll(CORE_ASSETS);
-      })
-      .then(() => self.skipWaiting())
-      .catch(error => {
-        console.error('Service Worker install failed (addAll error):', error);
-        console.error('Failed to cache the following core assets:');
-
-        Promise.allSettled(CORE_ASSETS.map(url =>
-            fetch(url, { cache: 'no-store' })
-        ))
-        .then(results => {
-            results.forEach((result, index) => {
-                const url = CORE_ASSETS[index];
-                if (result.status === 'rejected') {
-                    console.error(`- URL: ${url} (Network Error):`, result.reason);
-                } else if (result.value && !result.value.ok) {
-                    console.error(`- URL: ${url} (HTTP Error):`, result.value.status, result.value.statusText);
-                }
-            });
-        })
-        .finally(() => {
-            console.warn('Diagnosis fetch aset individual selesai. Periksa error spesifik di atas.');
-        });
-      })
-  );
+  console.log('Service Worker: Installing...');
+  event.waitUntil(self.skipWaiting());
 });
+
 
 // Activate Event - Clean Old Caches
 self.addEventListener('activate', (event) => {
@@ -69,7 +47,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
-          if (cache !== CORE_CACHE && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
+          if (!cache.startsWith('workbox-precache') && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
             console.log('Deleting old cache:', cache);
             return caches.delete(cache);
           }
@@ -79,7 +57,6 @@ self.addEventListener('activate', (event) => {
     .then(() => self.clients.claim())
   );
 });
-
 
 // Fetch Event - Advanced Caching Strategy
 self.addEventListener('fetch', (event) => {
@@ -98,25 +75,15 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Cache API responses with Network First
-  if (url.pathname.startsWith('/stories')) {
+  if (url.pathname.startsWith('/stories')) { // Ini endpoint API, tetap /stories
     event.respondWith(
       networkFirstWithCache(request, ASSET_CACHE)
     );
     return;
   }
 
-  // For Core Assets: Cache First
-  if (CORE_ASSETS.includes(url.pathname)) {
-    event.respondWith(
-      caches.match(request)
-        .then(cached => cached || fetch(request))
-    );
-    return;
-  }
-
-  // For everything else: Network First with Offline Fallback
   event.respondWith(
-    networkFirstWithCache(request, ASSET_CACHE) // Ini akan mencakup aset precached jika belum ada di cache utama
+    networkFirstWithCache(request, ASSET_CACHE)
       .catch(() => offlineFallback())
   );
 });
@@ -128,9 +95,10 @@ self.addEventListener('push', (event) => {
     title: 'New Story',
     options: {
       body: 'A new story has been shared',
-      icon: '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN: Tambahkan /storyApps/
+      icon: '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN
     }
   };
+
   event.waitUntil(
     self.registration.showNotification(payload.title, payload.options)
   );
@@ -145,7 +113,7 @@ self.addEventListener('notificationclick', (event) => {
         if (clients.length) {
           return clients[0].focus();
         }
-        return self.clients.openWindow('/storyApps/'); // <-- PERBAIKAN: Tambahkan /storyApps/
+        return self.clients.openWindow('/storyApps/'); // <-- PERBAIKAN
       })
   );
 });
@@ -184,7 +152,7 @@ async function networkFirstWithCache(request, cacheName) {
 }
 
 function offlineFallback() {
-  return caches.match('/storyApps/offline.html'); // <-- PERBAIKAN: Tambahkan /storyApps/
+  return caches.match('/storyApps/offline.html'); // <-- PERBAIKAN
 }
 
 async function syncStories() {
