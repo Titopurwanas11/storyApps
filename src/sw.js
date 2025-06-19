@@ -1,3 +1,5 @@
+// src/sw.js
+
 import { precacheAndRoute } from 'workbox-precaching';
 
 const CACHE_VERSION = 'v3';
@@ -47,7 +49,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
-          if (!cache.startsWith('workbox-precache') && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
+          if (!cache.startsWith('workbox-precache') && cache !== CORE_CACHE && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
             console.log('Deleting old cache:', cache);
             return caches.delete(cache);
           }
@@ -63,11 +65,9 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // --- PERBAIKAN DI SINI: Lewati request dari ekstensi browser ---
   if (url.protocol === 'chrome-extension:') {
-    return; // Biarkan browser menangani request ini, jangan diintersep oleh Service Worker
+    return; // Lewati request dari ekstensi browser
   }
-  // --- AKHIR PERBAIKAN ---
 
   if (request.method !== 'GET') return;
 
@@ -81,13 +81,15 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Cache API responses with Network First
-  if (url.pathname.startsWith('/stories')) {
+  if (url.pathname.startsWith('/stories')) { // Ini endpoint API, tetap /stories
     event.respondWith(
       networkFirstWithCache(request, ASSET_CACHE)
     );
     return;
   }
 
+  // Untuk aset yang diprecache (CORE_ASSETS oleh Workbox), Workbox otomatis akan melayaninya
+  // Untuk sisanya (non-precached, non-map, non-API), gunakan Network First with Offline Fallback
   event.respondWith(
     networkFirstWithCache(request, ASSET_CACHE)
       .catch(() => offlineFallback())
@@ -158,17 +160,7 @@ async function networkFirstWithCache(request, cacheName) {
 }
 
 function offlineFallback() {
-  return caches.match('/storyApps/offline.html') // Ini mengembalikan Promise<Response|undefined>
-    .then(response => {
-      if (response) {
-        return response;
-      }
-      return new Response('Konten offline tidak ditemukan.', { status: 404, statusText: 'Not Found (Offline)' });
-    })
-    .catch(error => {
-      console.error('Error saat mengakses cache offline untuk fallback:', error);
-      return new Response('Gagal mengakses cache offline.', { status: 500, statusText: 'Internal Server Error (Offline)' });
-    });
+  return caches.match('/storyApps/offline.html'); // <-- PERBAIKAN
 }
 
 async function syncStories() {

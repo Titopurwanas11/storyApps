@@ -1,1 +1,0 @@
-"serviceWorker"in navigator&&window.addEventListener("load",(()=>{navigator.serviceWorker.register("/storyApps/sw.js").then((e=>{console.log("ServiceWorker registered")})).catch((e=>{console.log("ServiceWorker registration failed: ",e)}))}));
