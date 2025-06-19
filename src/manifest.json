@@ -2,63 +2,35 @@
   "name": "Story Map App",
   "short_name": "Story Map",
   "description": "Aplikasi untuk berbagi cerita dan menampilkan lokasi di peta.",
-<<<<<<< HEAD
   "start_url": "/storyApps/",
-=======
-  "start_url": "/storyApps/",  
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
   "display": "standalone",
   "background_color": "#eef2f7",
   "theme_color": "#007bff",
   "icons": [
     {
-<<<<<<< HEAD
       "src": "/storyApps/assets/icons/android-chrome-192x192.png", 
-=======
-      "src": "/assets/icons/android-chrome-192x192.png", 
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-<<<<<<< HEAD
       "src": "/storyApps/assets/icons/android-chrome-512x512.png", 
-=======
-      "src": "/assets/icons/android-chrome-512x512.png", 
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-<<<<<<< HEAD
       "src": "/storyApps/assets/icons/apple-touch-icon.png", 
-=======
-      "src": "/assets/icons/apple-touch-icon.png", 
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-<<<<<<< HEAD
       "src": "/storyApps/assets/icons/favicon-16x16.png", 
-=======
-      "src": "/assets/icons/favicon-16x16.png", 
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
       "sizes": "16x16",
       "type": "image/png"
     },
     {
-<<<<<<< HEAD
       "src": "/storyApps/assets/icons/favicon-32x32.png", 
       "sizes": "32x32",
       "type": "image/png"
     }
   ]
-=======
-      "src": "/assets/icons/favicon-32x32.png", 
-      "sizes": "32x32",
-      "type": "image/png"
-    }
-    ]
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
 }

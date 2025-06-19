@@ -8,12 +8,6 @@ module.exports = {
   mode: 'development',
   entry: {
     app: path.resolve(__dirname, 'src/js/app.js'),
-<<<<<<< HEAD
-    
-=======
-    // PERHATIAN: Hapus atau komentari 'sw' entry point jika ada, karena InjectManifest akan menanganinya
-    // sw: path.resolve(__dirname, 'src/sw.js'),
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
   },
   output: {
     filename: 'js/[name].bundle.js',
@@ -40,10 +34,6 @@ module.exports = {
         { from: path.resolve(__dirname, 'src/offline.html'), to: 'offline.html' },
         { from: path.resolve(__dirname, 'src/js/sw-register.js'), to: 'js/sw-register.js' },
 
-<<<<<<< HEAD
-=======
-        // Salin manifest.json karena masih ditautkan di index.html
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
         { from: path.resolve(__dirname, 'src/manifest.json'), to: 'manifest.json' },
 
         // Pola copy untuk ikon Leaflet Marker
@@ -63,21 +53,12 @@ module.exports = {
 
     // --- PERBAIKAN: Tambahkan InjectManifest plugin ---
     new InjectManifest({
-<<<<<<< HEAD
       swSrc: path.resolve(__dirname, 'src/sw.js'), // Sumber Service Worker Anda
       swDest: 'sw.js', // Nama file Service Worker output di folder dist/
-=======
-      swSrc: path.resolve(__dirname, 'src/sw.js'), 
-      swDest: 'sw.js', 
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
     }),
     // --- AKHIR PERBAIKAN ---
   ],
 
-<<<<<<< HEAD
-  // Konfigurasi devServer (tidak berubah)
-=======
->>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
   devServer: {
     static: { directory: path.resolve(__dirname, 'dist') },
     compress: true,
