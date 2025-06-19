@@ -1,37 +1,36 @@
 {
   "name": "Story Map App",
   "short_name": "Story Map",
-  "description": "Aplikasi untuk berbagi cerita dengan lokasi di peta.",
+  "description": "Aplikasi untuk berbagi cerita dan menampilkan lokasi di peta.",
   "start_url": "/storyApps/",
   "display": "standalone",
   "background_color": "#eef2f7",
   "theme_color": "#007bff",
   "icons": [
     {
-      "src": "/assets/icons/android-chrome-192x192.png",
+      "src": "/storyApps/assets/icons/android-chrome-192x192.png", 
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/android-chrome-512x512.png",
+      "src": "/storyApps/assets/icons/android-chrome-512x512.png", 
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/apple-touch-icon.png",
+      "src": "/storyApps/assets/icons/apple-touch-icon.png", 
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/favicon-16x16.png",
+      "src": "/storyApps/assets/icons/favicon-16x16.png", 
       "sizes": "16x16",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/favicon-32x32.png",
+      "src": "/storyApps/assets/icons/favicon-32x32.png", 
       "sizes": "32x32",
       "type": "image/png"
     }
-   
   ]
 }

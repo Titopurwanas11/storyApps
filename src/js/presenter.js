@@ -6,8 +6,7 @@ import { AuthService } from "./auth.js";
 import { AppError, handleError } from "./errorHandler.js";
 import { initMap, renderMarkers } from "./map.js"; 
 import { getCapturedPhotoFile, setCapturedPhotoFile } from './view.js';
-import { clearStories } from './db.js';
-
+import { getStories, storeStory, deleteStoryById } from './db.js';
 let mapInstanceForStories = null; 
 
 export class AuthPresenter {
@@ -90,19 +89,31 @@ export class AuthPresenter {
 }
 
 export class StoriesPresenter {
-  static async loadStories() {
-    try {
-      const stories = await StoryModel.getAll();
-      this.renderStories(stories);
-      if (document.getElementById('map')) {
-        this.renderMap(stories);
-      }
-    } catch (error) {
-      console.error("Gagal memuat stories:", error);
-      showToast("Gagal memuat story. Coba lagi nanti.", "error");
-      handleError(new AppError(error.message, "NETWORK", { originalError: error })); // Tambahkan penanganan error jaringan
+    static async loadStories() {
+        try {
+            const stories = await StoryModel.getAll(); // Sekarang hanya fetch dari jaringan
+
+            // --- PERBAIKAN: Dapatkan status bookmark untuk setiap story ---
+            const bookmarkedStories = await getStories(); // Ambil semua story yang di-bookmark
+            const bookmarkedStoryIds = new Set(bookmarkedStories.map(s => s.id));
+
+            // Tambahkan properti isBookmarked ke setiap story
+            const storiesWithBookmarkStatus = stories.map(story => ({
+                ...story,
+                isBookmarked: bookmarkedStoryIds.has(story.id)
+            }));
+            // --- AKHIR PERBAIKAN ---
+
+            this.renderStories(storiesWithBookmarkStatus); // Render dengan status bookmark
+            if (document.getElementById('map')) {
+                this.renderMap(storiesWithBookmarkStatus);
+            }
+        } catch (error) {
+            console.error("Gagal memuat stories:", error);
+            showToast("Gagal memuat story. Coba lagi nanti.", "error");
+            handleError(new AppError(error.message, "NETWORK", { originalError: error }));
+        }
     }
-  }
 
   static async handleAddStory(e) {
         e.preventDefault();
@@ -172,6 +183,24 @@ export class StoriesPresenter {
             handleError(new AppError(error.message, "API_ERROR", { originalError: error }));
         }
         
+    }
+
+    static async toggleBookmark(story) {
+        try {
+            if (story.isBookmarked) {
+                await deleteStoryById(story.id);
+                showToast(`Story '${story.name}' telah dihapus dari bookmark.`, "info");
+            } else {
+                await storeStory(story); // Simpan seluruh objek story
+                showToast(`Story '${story.name}' telah ditambahkan ke bookmark!`, "success");
+            }
+            // Muat ulang stories untuk memperbarui tampilan tombol
+            this.loadStories();
+        } catch (error) {
+            console.error("Gagal mengelola bookmark:", error);
+            showToast("Gagal mengelola bookmark.", "error");
+            handleError(new AppError(error.message, "DB_ERROR", { originalError: error }));
+        }
     }
     
   static async clearAllStories() {

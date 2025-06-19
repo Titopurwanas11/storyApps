@@ -1,19 +1,9 @@
-// src/js/model.js
-import { getStories, storeStory } from './db.js'; // <-- PERBAIKAN: Import IndexedDB functions
-
 const API_BASE = 'https://story-api.dicoding.dev/v1';
 
 export class StoryModel {
     static async getAll() {
-        // --- START PERBAIKAN: Implementasi Cache, then Network ---
-        const cachedStories = await getStories(); // Coba ambil dari IndexedDB
-        if (cachedStories.length > 0) {
-            console.log('Serving stories from IndexedDB cache.');
-            return cachedStories; // Sajikan dari cache segera
-        }
-
-        // Jika tidak ada di cache, baru fetch dari jaringan
-        console.log('Fetching stories from network...');
+        // --- PERBAIKAN: Hapus seluruh logika IndexedDB caching otomatis ---
+        console.log('Fetching all stories from network...');
         const response = await fetch(`${API_BASE}/stories`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -21,25 +11,15 @@ export class StoryModel {
         });
 
         if (!response.ok) {
-            // Jika fetch gagal (misal: offline), coba ambil lagi dari IndexedDB (fallback)
-            const fallbackStories = await getStories();
-            if (fallbackStories.length > 0) {
-                console.warn('Network fetch failed, serving from IndexedDB fallback.');
-                return fallbackStories;
-            }
-            throw new Error('Failed to fetch stories and no offline data available.');
+            // Jika fetch gagal (misal: offline), lempar error.
+            // Presenter akan menanganinya dan menampilkan pesan error.
+            throw new Error('Failed to fetch stories from network.');
         }
 
         const data = await response.json();
         const fetchedStories = data.listStory;
-
-        // Simpan cerita yang baru diambil ke IndexedDB untuk penggunaan di masa mendatang
-        if (fetchedStories.length > 0) {
-            for (const story of fetchedStories) {
-                await storeStory(story); // Simpan setiap cerita
-            }
-            console.log('Stories fetched from network and stored in IndexedDB.');
-        }
+        console.log('Stories fetched from network.');
+        // HAPUS: for (const story of fetchedStories) { await storeStory(story); }
         return fetchedStories;
         // --- AKHIR PERBAIKAN ---
     }
@@ -59,7 +39,6 @@ export class StoryModel {
         }
 
         const newStoryData = await response.json();
-        
         return newStoryData;
     }
 }
