@@ -152,7 +152,17 @@ async function networkFirstWithCache(request, cacheName) {
 }
 
 function offlineFallback() {
-  return caches.match('/storyApps/offline.html'); // <-- PERBAIKAN
+  return caches.match('/storyApps/offline.html') // Ini mengembalikan Promise<Response|undefined>
+    .then(response => {
+      if (response) {
+        return response;
+      }
+      return new Response('Konten offline tidak ditemukan.', { status: 404, statusText: 'Not Found (Offline)' });
+    })
+    .catch(error => {
+      console.error('Error saat mengakses cache offline untuk fallback:', error);
+      return new Response('Gagal mengakses cache offline.', { status: 500, statusText: 'Internal Server Error (Offline)' });
+    });
 }
 
 async function syncStories() {
