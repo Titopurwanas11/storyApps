@@ -27,6 +27,8 @@ const MAP_RESOURCES = [
   // --- PERBAIKAN: errorTileUrl jika itu aset lokal ---
   '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN: tambahkan /storyApps/
 ];
+
+precacheAndRoute(self.__WB_MANIFEST);
 // Install Event - Cache Core Assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
