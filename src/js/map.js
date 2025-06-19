@@ -1,3 +1,5 @@
+// src/js/map.js
+
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
@@ -37,6 +39,16 @@ const TILE_CONFIG = {
   errorTileUrl: '/storyApps/assets/images/map-error.webp'
 };
 
+// --- PERBAIKAN: Definisikan dan Export CLUSTER_CONFIG di level module ---
+export const CLUSTER_CONFIG = { // <--- DEFINISI DI SINI DAN DI-EXPORT
+  spiderfyOnMaxZoom: true,
+  showCoverageOnHover: false,
+  zoomToBoundsOnClick: true,
+  chunkedLoading: true,
+  chunkInterval: 100,
+  disableClusteringAtZoom: 17
+};
+// --- AKHIR PERBAIKAN ---
 
 
 // Inisialisasi Peta
@@ -67,21 +79,9 @@ export const initMap = (containerId, center = [-2.5489, 118.0149], zoom = 4) => 
 export const renderMarkers = (map, stories = []) => {
   if (!map || !stories.length) return;
 
-  // Hapus layer marker sebelumnya jika ada
   if (map._markerCluster) {
     map.removeLayer(map._markerCluster);
   }
-
-  // --- PERBAIKAN: Pindahkan definisi CLUSTER_CONFIG ke SINI (ke dalam fungsi) ---
-  const CLUSTER_CONFIG = {
-    spiderfyOnMaxZoom: true,
-    showCoverageOnHover: false,
-    zoomToBoundsOnClick: true,
-    chunkedLoading: true,
-    chunkInterval: 100,
-    disableClusteringAtZoom: 17
-  };
-  // --- AKHIR PERBAIKAN ---
 
   // Buat marker cluster group
   const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG); // Sekarang CLUSTER_CONFIG pasti terdefinisi
@@ -98,7 +98,7 @@ export const renderMarkers = (map, stories = []) => {
       keyboard: true
     });
 
-    // Popup content dengan lazy loading image
+    // --- PERBAIKAN: Popup content dengan syntax yang benar ---
     const popupContent = `
       <div class="popup-content">
         <h3>${story.name}</h3>
@@ -113,6 +113,7 @@ export const renderMarkers = (map, stories = []) => {
         <small>${new Date(story.createdAt).toLocaleDateString()}</small>
       </div>
     `;
+    // --- AKHIR PERBAIKAN ---
 
     marker.bindPopup(popupContent, {
       maxWidth: 300,
@@ -162,11 +163,14 @@ export const setupMapClickHandler = (map, callback) => {
       icon: appCustomMarkerIcon,
       draggable: true,
       title: 'Lokasi dipilih',
-      alt: `Marker lokasi story`
+      alt: `Lokasi story ${story.name}`,
+      keyboard: true
     }).addTo(map);
 
+    // Panggil callback dengan koordinat
     callback(lat, lng);
 
+    // Handle marker drag
     marker.on('dragend', (e) => {
       const newPos = e.target.getLatLng();
       callback(newPos.lat, newPos.lng);
