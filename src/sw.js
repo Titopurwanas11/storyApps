@@ -1,57 +1,73 @@
-import { precacheAndRoute } from 'workbox-precaching';
-
 const CACHE_VERSION = 'v3';
 const CORE_CACHE = `core-${CACHE_VERSION}`;
-const MAP_CACHE = `map-${CACHE_CACHE}`; // Perbaiki typo jika ada, harusnya MAP_CACHE
+const MAP_CACHE = `map-${CACHE_VERSION}`;
 const ASSET_CACHE = `asset-${CACHE_VERSION}`;
 
 // Critical Assets - Sesuaikan dengan output Webpack
 const CORE_ASSETS = [
     '/storyApps/',                 // <-- PERBAIKAN: root URL dengan repository name
-    '/storyApps/index.html',       // <-- PERBAIKAN
-    '/js/app.bundle.js',           // Ini sudah benar dari webpack.output.filename, karena publicPath sudah diatur
-    '/storyApps/offline.html',     // <-- PERBAIKAN
-    '/storyApps/manifest.json',    // <-- PERBAIKAN
-    // Ikon PWA (pastikan ini ada di src/assets/icons/ dan disalin oleh webpack)
-    '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN
-    '/storyApps/assets/icons/android-chrome-512x512.png', // <-- PERBAIKAN
-    '/storyApps/assets/icons/apple-touch-icon.png',       // <-- PERBAIKAN
-    '/storyApps/assets/icons/favicon-16x16.png',          // <-- PERBAIKAN
-    '/storyApps/assets/icons/favicon-32x32.png',          // <-- PERBAIKAN
-    '/storyApps/assets/icons/favicon.ico',                // <-- PERBAIKAN
+    '/storyApps/index.html',
+    '/storyApps/js/app.bundle.js',
+    '/storyApps/offline.html',
+    '/storyApps/manifest.json',    // <-- PERBAIKAN: manifest.json path
+    '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN: icon paths
+    '/storyApps/assets/icons/android-chrome-512x512.png',
+    '/storyApps/assets/icons/apple-touch-icon.png',
+    '/storyApps/assets/icons/favicon-16x16.png',
+    '/storyApps/assets/icons/favicon-32x32.png',
+    '/storyApps/assets/icons/favicon.ico', // Jika Anda punya dan ingin di-cache
 ];
 
-// Map Resources - CDN tetap sama, tapi aset lokal harus diperbaiki jalurnya
+// Map Resources - Ini tetap sama untuk CDN, tapi errorTileUrl harus diperbaiki
 const MAP_RESOURCES = [
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js',
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN: errorTileUrl aset lokal
+  // --- PERBAIKAN: errorTileUrl jika itu aset lokal ---
+  '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN: tambahkan /storyApps/
 ];
-
-// --- PERBAIKAN: Implementasi Precaching dengan Workbox ---
-// Do precaching with the manifest injected by Workbox
-precacheAndRoute(self.__WB_MANIFEST);
-// --- AKHIR PERBAIKAN ---
-
-// Install Event - Cache Core Assets (Ini sekarang ditangani oleh precacheAndRoute)
+// Install Event - Cache Core Assets
 self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installing...');
-  event.waitUntil(self.skipWaiting()); // Tetap ada untuk mengaktifkan SW baru segera
+  event.waitUntil(
+    caches.open(CORE_CACHE)
+      .then(cache => {
+        console.log('Caching core assets:', CORE_ASSETS);
+        return cache.addAll(CORE_ASSETS);
+      })
+      .then(() => self.skipWaiting())
+      .catch(error => {
+        console.error('Service Worker install failed (addAll error):', error);
+        console.error('Failed to cache the following core assets:');
+
+        Promise.allSettled(CORE_ASSETS.map(url =>
+            fetch(url, { cache: 'no-store' })
+        ))
+        .then(results => {
+            results.forEach((result, index) => {
+                const url = CORE_ASSETS[index];
+                if (result.status === 'rejected') {
+                    console.error(`- URL: ${url} (Network Error):`, result.reason);
+                } else if (result.value && !result.value.ok) {
+                    console.error(`- URL: ${url} (HTTP Error):`, result.value.status, result.value.statusText);
+                }
+            });
+        })
+        .finally(() => {
+            console.warn('Diagnosis fetch aset individual selesai. Periksa error spesifik di atas.');
+        });
+      })
+  );
 });
 
-
-// Activate Event - Clean Old Caches (Pertahankan, tapi sesuaikan nama cache jika CORE_CACHE tidak dipakai lagi)
+// Activate Event - Clean Old Caches
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activating...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
-          // Hapus cache lama, kecuali cache yang dikelola Workbox (misal: "workbox-precache-XXXX")
-          // dan cache yang Anda kelola sendiri (MAP_CACHE, ASSET_CACHE)
-          if (!cache.startsWith('workbox-precache') && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
+          if (cache !== CORE_CACHE && cache !== MAP_CACHE && cache !== ASSET_CACHE) {
             console.log('Deleting old cache:', cache);
             return caches.delete(cache);
           }
@@ -61,6 +77,7 @@ self.addEventListener('activate', (event) => {
     .then(() => self.clients.claim())
   );
 });
+
 
 // Fetch Event - Advanced Caching Strategy
 self.addEventListener('fetch', (event) => {
@@ -78,18 +95,26 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache API responses with Network First (tetap)
-  if (url.pathname.startsWith('/stories')) { // Pastikan ini tetap '/stories' karena ini endpoint API absolute
+  // Cache API responses with Network First
+  if (url.pathname.startsWith('/stories')) {
     event.respondWith(
       networkFirstWithCache(request, ASSET_CACHE)
     );
     return;
   }
 
-  // Untuk aset yang diprecache (CORE_ASSETS oleh Workbox), Workbox otomatis akan melayaninya
-  // Untuk sisanya (non-precached, non-map, non-API), gunakan Network First with Offline Fallback
+  // For Core Assets: Cache First
+  if (CORE_ASSETS.includes(url.pathname)) {
+    event.respondWith(
+      caches.match(request)
+        .then(cached => cached || fetch(request))
+    );
+    return;
+  }
+
+  // For everything else: Network First with Offline Fallback
   event.respondWith(
-    networkFirstWithCache(request, ASSET_CACHE)
+    networkFirstWithCache(request, ASSET_CACHE) // Ini akan mencakup aset precached jika belum ada di cache utama
       .catch(() => offlineFallback())
   );
 });
@@ -104,7 +129,6 @@ self.addEventListener('push', (event) => {
       icon: '/storyApps/assets/icons/android-chrome-192x192.png', // <-- PERBAIKAN: Tambahkan /storyApps/
     }
   };
-
   event.waitUntil(
     self.registration.showNotification(payload.title, payload.options)
   );

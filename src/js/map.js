@@ -17,18 +17,18 @@ const appCustomMarkerIcon = L.icon({
 });
 
 
-
 const MAP_CONFIG = {
-  preferCanvas: true,
-  fadeAnimation: false,
-  zoomSnap: 0.5,
-  wheelPxPerZoomLevel: 60,
-  inertia: true,
-  inertiaDeceleration: 3000
+  preferCanvas: true,
+  fadeAnimation: false,
+  zoomSnap: 0.5,
+  wheelPxPerZoomLevel: 60,
+  inertia: true,
+  inertiaDeceleration: 3000
 };
 
 // Konfigurasi Tile Layer
 const TILE_CONFIG = {
+<<<<<<< HEAD
   maxZoom: 19,
   minZoom: 3,
   reuseTiles: true,
@@ -36,6 +36,15 @@ const TILE_CONFIG = {
   crossOrigin: true,
   detectRetina: true,
   errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN DI SINI
+=======
+  maxZoom: 19,
+  minZoom: 3,
+  reuseTiles: true,
+  updateWhenIdle: true,
+  crossOrigin: true,
+  detectRetina: true,
+  errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN DI SINI
+>>>>>>> 55d9d96762600f07a765da03efa80212afe0c4bb
 };
 
 // Konfigurasi Marker Cluster
