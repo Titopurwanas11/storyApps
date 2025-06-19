@@ -1,5 +1,3 @@
-// src/js/view.js
-
 import { StoriesPresenter, AuthPresenter } from './presenter.js'; // Import AuthPresenter juga
 import { initMap, setupMapClickHandler, locateUser } from './map.js';
 import { showToast } from './utils/helpers.js';

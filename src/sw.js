@@ -1,5 +1,3 @@
-// src/sw.js
-
 import { precacheAndRoute } from 'workbox-precaching';
 
 const CACHE_VERSION = 'v3';
@@ -88,8 +86,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Untuk aset yang diprecache (CORE_ASSETS oleh Workbox), Workbox otomatis akan melayaninya
-  // Untuk sisanya (non-precached, non-map, non-API), gunakan Network First with Offline Fallback
+  // For Core Assets: Cache First
+  if (CORE_ASSETS.includes(url.pathname)) {
+    event.respondWith(
+      caches.match(request)
+        .then(cached => cached || fetch(request))
+    );
+    return;
+  }
+
+  // For everything else: Network First with Offline Fallback
   event.respondWith(
     networkFirstWithCache(request, ASSET_CACHE)
       .catch(() => offlineFallback())

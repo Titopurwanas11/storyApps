@@ -1,5 +1,3 @@
-// src/js/map.js
-
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
@@ -76,7 +74,7 @@ export const renderMarkers = (map, stories = []) => {
   }
 
   // Buat marker cluster group
-  const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG);
+  const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG); // CLUSTER_CONFIG harus dipindahkan ke sini
 
   // Tambahkan marker untuk setiap story
   stories.forEach(story => {
@@ -93,15 +91,15 @@ export const renderMarkers = (map, stories = []) => {
     // Popup content dengan lazy loading image
     const popupContent = `
       <div class="popup-content">
-        <h3><span class="math-inline">\{story\.name\}</h3\>
-<img src\="/storyApps/assets/images/placeholder\.webp"
-data\-src\="</span>{story.photoUrl}"
-             alt="<span class="math-inline">\{story\.description \|\| 'Story image'\}"
-loading\="lazy"
-class\="story\-image"
-width\="200"
-height\="150"\>
-<p\></span>{story.description}</p>
+        <h3>${story.name}</h3>
+        <img src="/storyApps/assets/images/placeholder.webp"
+             data-src="${story.photoUrl}"
+             alt="${story.description || 'Story image'}"
+             loading="lazy"
+             class="story-image"
+             width="200"
+             height="150">
+        <p>${story.description}</p>
         <small>${new Date(story.createdAt).toLocaleDateString()}</small>
       </div>
     `;
@@ -155,7 +153,7 @@ export const setupMapClickHandler = (map, callback) => {
       icon: appCustomMarkerIcon, // <--- GUNAKAN IKON GLOBAL DI SINI!
       draggable: true,
       title: 'Lokasi dipilih',
-      alt: 'Marker lokasi story'
+      alt: `Marker lokasi story`
     }).addTo(map);
 
     // Panggil callback dengan koordinat
