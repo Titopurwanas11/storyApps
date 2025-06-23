@@ -165,7 +165,7 @@ export const setupMapClickHandler = (map, callback) => {
       icon: appCustomMarkerIcon,
       draggable: true,
       title: 'Lokasi dipilih',
-      alt: `Lokasi dipilih: Lat ${lat.toFixed(4)}, Lon ${lng.toFixed(4)}`, // <-- PERBAIKAN DI SINI!
+      alt: `Lokasi dipilih di Lat: ${lat.toFixed(4)}, Lon: ${lng.toFixed(4)}`, // <-- PERBAIKAN DI SINI
       keyboard: true
     }).addTo(map);
 
@@ -187,6 +187,7 @@ export const setupMapClickHandler = (map, callback) => {
     if (marker) map.removeLayer(marker);
   };
 };
+
 
 // Fungsi untuk update lokasi user
 export const locateUser = (map) => {
