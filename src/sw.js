@@ -24,13 +24,13 @@ const CORE_ASSETS = [
 ];
 
 // Map Resources - CDN tetap sama, tapi errorTileUrl harus diperbaiki
+// src/sw.js
 const MAP_RESOURCES = [
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js',
-  'https://unpkg.com/leaflet.lazyload@1.0.0/Leaflet.LazyLoad.min.js', // Tambahkan ini jika Anda menggunakannya
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN
+  '/storyApps/assets/images/map-error.webp'
 ];
 
 precacheAndRoute(self.__WB_MANIFEST);

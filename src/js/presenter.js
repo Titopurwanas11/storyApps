@@ -217,58 +217,58 @@ export class StoriesPresenter {
     }
     
   static renderStories(stories) {
-    const container = document.getElementById("storiesList");
-    if (!container) return;
+        const container = document.getElementById("storiesList");
+        if (!container) return;
 
-    container.innerHTML = stories
-      .map(
-        (story) => `
-          <article class="story-card" aria-labelledby="story-<span class="math-inline">\{story\.id\}"\>
-<img
-src\="</span>{story.photoUrl}"
-              alt="<span class="math-inline">\{story\.description \|\| "Story image"\}"
-loading\="lazy"
-\>
-<div class\="story\-content"\>
-<h3 id\="story\-</span>{story.id}"><span class="math-inline">\{story\.name\}</h3\>
-<p\></span>{story.description}</p>
-              <time datetime="${story.createdAt}">
-                ${new Date(story.createdAt).toLocaleDateString('id-ID')}
-              </time>
-              ${
-                story.lat && story.lon
-                  ? `
-                  <div class="map-marker" data-lat="${story.lat}" data-lon="${story.lon}">
-                    📍 Lokasi
-                  </div>
-                `
-                  : ""
-              }
-            </div>
-          </article>
-        `
-      )
-      .join("");
-  }
+        container.innerHTML = stories
+            .map(
+                (story) => `
+                    <article class="story-card" aria-labelledby="story-${story.id}">
+                        <img
+                            src="${story.photoUrl}"
+                            alt="${story.description || "Story image"}"
+                            loading="lazy"
+                        >
+                        <div class="story-content">
+                            <h3 id="story-${story.id}">${story.name}</h3>
+                            <p>${story.description}</p>
+                            <time datetime="${story.createdAt}">
+                                ${new Date(story.createdAt).toLocaleDateString('id-ID')}
+                            </time>
+                            ${
+                                story.lat && story.lon
+                                    ? `
+                                    <div class="map-marker" data-lat="${story.lat}" data-lon="${story.lon}">
+                                        📍 Lokasi
+                                    </div>
+                                    `
+                                    : ""
+                            }
+                        </div>
+                    </article>
+                `
+            )
+            .join("");
+    }
 
-  static renderMap(stories) {
-    const mapContainer = document.getElementById("map");
-    if (!mapContainer) return;
+    static renderMap(stories) {
+        const mapContainer = document.getElementById("map");
+        if (!mapContainer) return;
 
-    const mapLoader = mapContainer.querySelector('.map-loader');
-    if (mapLoader) {
-        mapLoader.remove();
-    }
+        const mapLoader = mapContainer.querySelector('.map-loader');
+        if (mapLoader) {
+            mapLoader.remove();
+        }
 
-    if (!mapInstanceForStories) {
-      mapInstanceForStories = initMap('map'); 
-    }
+        if (!mapInstanceForStories) {
+            mapInstanceForStories = initMap('map');
+        }
 
-    if (mapInstanceForStories) {
-        if (mapInstanceForStories._markerCluster) {
-            mapInstanceForStories.removeLayer(mapInstanceForStories._markerCluster);
-        }
-        renderMarkers(mapInstanceForStories, stories); 
-    }
-  }
+        if (mapInstanceForStories) {
+            if (mapInstanceForStories._markerCluster) {
+                mapInstanceForStories.removeLayer(mapInstanceForStories._markerCluster);
+            }
+            renderMarkers(mapInstanceForStories, stories);
+        }
+    }
 }
