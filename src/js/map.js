@@ -3,18 +3,18 @@
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp',
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp',         // <-- PERBAIKAN
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',     // <-- PERBAIKAN
 });
 
 const appCustomMarkerIcon = L.icon({
-  iconUrl: '/storyApps/assets/icons/marker-icon.webp',
-  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp',
+  iconUrl: '/storyApps/assets/icons/marker-icon.webp', // <-- PERBAIKAN
+  iconRetinaUrl: '/storyApps/assets/icons/marker-icon-2x.webp', // <-- PERBAIKAN
   iconSize: [32, 41],
   iconAnchor: [16, 41],
   popupAnchor: [1, -34],
-  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp',
+  shadowUrl: '/storyApps/assets/icons/marker-shadow.webp', // <-- PERBAIKAN
   shadowSize: [41, 41]
 });
 
@@ -36,7 +36,7 @@ const TILE_CONFIG = {
   updateWhenIdle: true,
   crossOrigin: true,
   detectRetina: true,
-  errorTileUrl: '/storyApps/assets/images/map-error.webp'
+  errorTileUrl: '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN
 };
 
 // Inisialisasi Peta
@@ -74,7 +74,8 @@ export const renderMarkers = (map, stories = []) => {
     map.removeLayer(map._markerCluster);
   }
 
-  const CLUSTER_CONFIG = {
+  // --- PERBAIKAN: Pindahkan definisi CLUSTER_CONFIG ke SINI (ke dalam fungsi) ---
+  const CLUSTER_CONFIG = { // <--- DEFINISI DIPINDAHKAN KE DALAM FUNGSI INI
     spiderfyOnMaxZoom: true,
     showCoverageOnHover: false,
     zoomToBoundsOnClick: true,
@@ -82,6 +83,7 @@ export const renderMarkers = (map, stories = []) => {
     chunkInterval: 100,
     disableClusteringAtZoom: 17
   };
+  // --- AKHIR PERBAIKAN ---
 
   // Buat marker cluster group
   const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG);
@@ -94,16 +96,16 @@ export const renderMarkers = (map, stories = []) => {
       icon: appCustomMarkerIcon,
       riseOnHover: true,
       title: story.name,
-      alt: `${story.name}: ${story.description || 'Story image'}`, // Menggunakan alt yang lebih informatif
+      alt: `Lokasi story ${story.name}`,
       keyboard: true
     });
 
     // --- PERBAIKAN: Popup content dengan syntax yang benar ---
     const popupContent = `
       <div class="popup-content">
-        <h3>${story.name}</h3>
+        <h3>${story.name}</h3> 
         <img src="/storyApps/assets/images/placeholder.webp"
-             data-src="${story.photoUrl}"
+             data-src="${story.photoUrl}" 
              alt="${story.description || 'Story image'}"
              loading="lazy"
              class="story-image"
@@ -163,7 +165,7 @@ export const setupMapClickHandler = (map, callback) => {
       icon: appCustomMarkerIcon,
       draggable: true,
       title: 'Lokasi dipilih',
-      alt: `Lokasi dipilih: Lat ${lat.toFixed(4)}, Lon ${lng.toFixed(4)}`, // <-- PERBAIKAN DI SINI! (Alt attribute tanpa 'story')
+      alt: `Lokasi dipilih di Lat: ${lat.toFixed(4)}, Lon: ${lng.toFixed(4)}`, // <-- PERBAIKAN DI SINI
       keyboard: true
     }).addTo(map);
 
@@ -186,6 +188,7 @@ export const setupMapClickHandler = (map, callback) => {
   };
 };
 
+
 // Fungsi untuk update lokasi user
 export const locateUser = (map) => {
   return new Promise((resolve, reject) => {
@@ -200,7 +203,7 @@ export const locateUser = (map) => {
       .on('locationfound', (e) => {
         const { lat, lng } = e.latlng;
         L.marker([lat, lng], {
-          icon: appCustomMarkerIcon,
+          icon: appCustomMarkerIcon, // <-- Tambahkan ikon ini juga untuk marker lokasi user
           title: 'Lokasi Anda',
           alt: 'Marker lokasi user'
         }).addTo(map)
