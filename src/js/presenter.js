@@ -236,11 +236,27 @@ export class StoriesPresenter {
                                     `
                                     : ""
                             }
-                        </div>
+                        <button class="bookmark-button ${story.isBookmarked ? 'is-bookmarked' : ''}" data-story-id="${story.id}">
+                            ${story.isBookmarked ? 'Hapus dari Bookmark' : 'Simpan ke Bookmark'}
+                        </button>
+                    </div>
                     </article>
                 `
             )
             .join("");
+
+
+            container.querySelectorAll('.bookmark-button').forEach(button => {
+        const storyId = button.dataset.storyId;
+        // Temukan objek story yang sesuai dari daftar stories yang sedang dirender
+        const story = stories.find(s => s.id === storyId);
+        if (story) {
+            button.addEventListener('click', () => {
+                // Panggil toggleBookmark di Presenter saat tombol diklik
+                StoriesPresenter.toggleBookmark(story);
+            });
+        }
+    });
     }
 
     static renderMap(stories) {
