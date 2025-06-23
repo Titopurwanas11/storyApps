@@ -90,140 +90,138 @@ export const renderMarkers = (map, stories = []) => {
 
   // Tambahkan marker untuk setiap story
   stories.forEach(story => {
-    if (!story.lat || !story.lon) return;
+    if (!story.lat || !story.lon) return;
 
-    const marker = L.marker([story.lat, story.lon], {
-      icon: appCustomMarkerIcon,
-      riseOnHover: true,
-      title: story.name,
-      alt: `Lokasi story ${story.name}`,
-      keyboard: true
-    });
+    const marker = L.marker([story.lat, story.lon], {
+      icon: appCustomMarkerIcon, // <--- GUNAKAN IKON GLOBAL DI SINI!
+      riseOnHover: true,
+      title: story.name,
+      alt: `Lokasi story ${story.name}`,
+      keyboard: true
+    });
 
-    // --- PERBAIKAN: Popup content dengan syntax yang benar ---
-    const popupContent = `
-      <div class="popup-content">
-        <h3>${story.name}</h3> 
-        <img src="/storyApps/assets/images/placeholder.webp"
-             data-src="${story.photoUrl}" 
-             alt="${story.description || 'Story image'}"
-             loading="lazy"
-             class="story-image"
-             width="200"
-             height="150">
-        <p>${story.description}</p>
-        <small>${new Date(story.createdAt).toLocaleDateString()}</small>
-      </div>
-    `;
-    // --- AKHIR PERBAIKAN ---
+    // Popup content dengan lazy loading image
+    const popupContent = `
+      <div class="popup-content">
+        <h3>${story.name}</h3>
+        <img src="/assets/images/placeholder.webp"
+             data-src="${story.photoUrl}"
+             alt="${story.description || 'Story image'}"
+             loading="lazy"
+             class="story-image"
+             width="200"
+             height="150">
+        <p>${story.description}</p>
+        <small>${new Date(story.createdAt).toLocaleDateString()}</small>
+      </div>
+    `;
 
-    marker.bindPopup(popupContent, {
-      maxWidth: 300,
-      minWidth: 200,
-      autoPan: true
-    });
+    marker.bindPopup(popupContent, {
+      maxWidth: 300,
+      minWidth: 200,
+      autoPan: true
+    });
 
-    // Lazy load image saat popup dibuka
-    marker.on('popupopen', () => {
-      const img = document.querySelector('.popup-content img');
-      if (img && img.dataset.src) {
-        img.src = img.dataset.src;
-      }
-    });
+    // Lazy load image saat popup dibuka
+    marker.on('popupopen', () => {
+      const img = document.querySelector('.popup-content img');
+      if (img && img.dataset.src) {
+        img.src = img.dataset.src;
+      }
+    });
 
-    markerCluster.addLayer(marker);
-  });
+    markerCluster.addLayer(marker);
+  });
 
-  // Tambahkan cluster ke peta
-  map.addLayer(markerCluster);
-  map._markerCluster = markerCluster;
+  // Tambahkan cluster ke peta
+  map.addLayer(markerCluster);
+  map._markerCluster = markerCluster;
 
-  // Fit bounds jika ada marker
-  if (stories.some(s => s.lat && s.lon)) {
-    const bounds = markerCluster.getBounds();
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-    }
-  }
+  // Fit bounds jika ada marker
+  if (stories.some(s => s.lat && s.lon)) {
+    const bounds = markerCluster.getBounds();
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+  }
 };
 
 // Fungsi untuk menangani klik peta (ambil koordinat)
 export const setupMapClickHandler = (map, callback) => {
-  if (!map) return;
+  if (!map) return;
 
-  let marker = null;
-  const clickHandler = (e) => {
-    const { lat, lng } = e.latlng;
+  let marker = null;
+  const clickHandler = (e) => {
+    const { lat, lng } = e.latlng;
 
-    if (marker) {
-      map.removeLayer(marker);
-    }
+    // Hapus marker sebelumnya
+    if (marker) {
+      map.removeLayer(marker);
+    }
 
-  
-    // Tambahkan marker baru
-    marker = L.marker([lat, lng], {
-      icon: appCustomMarkerIcon,
-      draggable: true,
-      title: 'Lokasi dipilih',
-      alt: `Lokasi dipilih di Lat: ${lat.toFixed(4)}, Lon: ${lng.toFixed(4)}`, // <-- PERBAIKAN DI SINI
-      keyboard: true
-    }).addTo(map);
+  
+    // Tambahkan marker baru
+    marker = L.marker([lat, lng], {
+      icon: appCustomMarkerIcon, // <--- GUNAKAN IKON GLOBAL DI SINI!
+      draggable: true,
+      title: 'Lokasi dipilih',
+      alt: 'Marker lokasi story'
+    }).addTo(map);
 
-    // Panggil callback dengan koordinat
-    callback(lat, lng);
+    // Panggil callback dengan koordinat
+    callback(lat, lng);
 
-    // Handle marker drag
-    marker.on('dragend', (e) => {
-      const newPos = e.target.getLatLng();
-      callback(newPos.lat, newPos.lng);
-    });
-  };
+    // Handle marker drag
+    marker.on('dragend', (e) => {
+      const newPos = e.target.getLatLng();
+      callback(newPos.lat, newPos.lng);
+    });
+  };
 
-  map.on('click', clickHandler);
+  map.on('click', clickHandler);
 
-  // Fungsi cleanup
-  return () => {
-    map.off('click', clickHandler);
-    if (marker) map.removeLayer(marker);
-  };
+  // Fungsi cleanup
+  return () => {
+    map.off('click', clickHandler);
+    if (marker) map.removeLayer(marker);
+  };
 };
-
 
 // Fungsi untuk update lokasi user
 export const locateUser = (map) => {
-  return new Promise((resolve, reject) => {
-    if (!map) return reject('Map not initialized');
+  return new Promise((resolve, reject) => {
+    if (!map) return reject('Map not initialized');
 
-    map.locate({
-      setView: true,
-      maxZoom: 16,
-      enableHighAccuracy: true,
-      timeout: 10000
-    })
-      .on('locationfound', (e) => {
-        const { lat, lng } = e.latlng;
-        L.marker([lat, lng], {
-          icon: appCustomMarkerIcon, // <-- Tambahkan ikon ini juga untuk marker lokasi user
-          title: 'Lokasi Anda',
-          alt: 'Marker lokasi user'
-        }).addTo(map)
-          .bindPopup('Anda berada di sini')
-          .openPopup();
+    map.locate({
+      setView: true,
+      maxZoom: 16,
+      enableHighAccuracy: true,
+      timeout: 10000
+    })
+      .on('locationfound', (e) => {
+        const { lat, lng } = e.latlng;
+        L.marker([lat, lng], {
+          icon: appCustomMarkerIcon, // <-- Tambahkan ikon ini juga untuk marker lokasi user
+          title: 'Lokasi Anda',
+          alt: 'Marker lokasi user'
+        }).addTo(map)
+          .bindPopup('Anda berada di sini')
+          .openPopup();
 
-        resolve({ lat, lng });
-      })
-      .on('locationerror', (err) => {
-        console.error('Geolocation error:', err.message);
-        reject(err.message);
-      });
-  });
+        resolve({ lat, lng });
+      })
+      .on('locationerror', (err) => {
+        console.error('Geolocation error:', err.message);
+        reject(err.message);
+      });
+  });
 };
 
 // Cleanup peta
 export const cleanupMap = (containerId) => {
-  const container = document.getElementById(containerId);
-  if (container && container._map) {
-    container._map.remove();
-    delete container._map;
-  }
+  const container = document.getElementById(containerId);
+  if (container && container._map) {
+    container._map.remove();
+    delete container._map;
+  }
 };
