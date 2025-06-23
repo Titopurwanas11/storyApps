@@ -6,7 +6,7 @@ import { AuthService } from "./auth.js";
 import { AppError, handleError } from "./errorHandler.js";
 import { initMap, renderMarkers } from "./map.js";
 import { getCapturedPhotoFile, setCapturedPhotoFile } from './view.js';
-import { getStories, storeStory, deleteStoryById } from './db.js';
+import { getStories, storeStory, deleteStoryById, clearStories} from './db.js';
 
 let mapInstanceForStories = null;
 
