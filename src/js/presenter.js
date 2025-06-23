@@ -9,9 +9,7 @@ import { AppError, handleError } from "./errorHandler.js";
 import { initMap, renderMarkers } from "./map.js"; // CLUSTER_CONFIG DIHAPUS DARI SINI
 // --- AKHIR PERBAIKAN ---
 import { getCapturedPhotoFile, setCapturedPhotoFile } from './view.js';
-// --- PERBAIKAN: Import getStories, storeStory, deleteStoryById ---
-import { getStories, storeStory, deleteStoryById, clearStories } from './db.js';
-// --- AKHIR PERBAIKAN ---
+import { getStories, storeStory, deleteStoryById } from './db.js';
 
 let mapInstanceForStories = null;
 
@@ -48,6 +46,7 @@ export class AuthPresenter {
         const password = e.target.password.value;
 
         try {
+            // Logika untuk mengirim data registrasi ke API
             const response = await fetch('https://story-api.dicoding.dev/v1/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -60,6 +59,7 @@ export class AuthPresenter {
             }
 
             showToast('Registrasi berhasil! Silakan login.', 'success');
+            // Jika berhasil, arahkan ke halaman login
             if (document.startViewTransition) {
                 document.startViewTransition(() => {
                     location.hash = '#/login';
@@ -69,8 +69,8 @@ export class AuthPresenter {
             }
         } catch (error) {
             handleError(
-                new AppError(error.message, "AUTH", {
-                    code: error.code,
+                new AppError(error.message, "AUTH", { // Gunakan tipe AUTH untuk error registrasi
+                    code: error.code, // Error code dari API jika ada
                     originalError: error,
                 })
             );
@@ -95,26 +95,27 @@ export class AuthPresenter {
 export class StoriesPresenter {
     static async loadStories() {
         try {
-            const stories = await StoryModel.getAll();
+            const stories = await StoryModel.getAll(); // Sekarang hanya fetch dari jaringan
 
             // --- PERBAIKAN: Dapatkan status bookmark untuk setiap story ---
-            const bookmarkedStories = await getStories();
+            const bookmarkedStories = await getStories(); // Ambil semua story yang di-bookmark
             const bookmarkedStoryIds = new Set(bookmarkedStories.map(s => s.id));
 
+            // Tambahkan properti isBookmarked ke setiap story
             const storiesWithBookmarkStatus = stories.map(story => ({
                 ...story,
                 isBookmarked: bookmarkedStoryIds.has(story.id)
             }));
             // --- AKHIR PERBAIKAN ---
 
-            this.renderStories(storiesWithBookmarkStatus);
+            this.renderStories(storiesWithBookmarkStatus); // Render dengan status bookmark
             if (document.getElementById('map')) {
                 this.renderMap(storiesWithBookmarkStatus);
             }
         } catch (error) {
             console.error("Gagal memuat stories:", error);
             showToast("Gagal memuat story. Coba lagi nanti.", "error");
-            handleError(new AppError(error.message, "NETWORK", { originalError: error }));
+            handleError(new AppError(error.message, "NETWORK", { originalError: error })); // Tambahkan penanganan error jaringan
         }
     }
 
@@ -171,7 +172,7 @@ export class StoriesPresenter {
             } else {
                 location.hash = "#/stories";
             }
-            // await registerPushNotification(description); // <-- PERBAIKAN: Aktifkan ini nanti
+            // await registerPushNotification(description);
         } catch (error) {
             console.error("Gagal menambahkan story:", error);
             showToast(`Gagal: ${error.message}`, "error");
