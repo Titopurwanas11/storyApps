@@ -1,13 +1,10 @@
-// src/js/presenter.js
 import { StoryModel } from "./model.js";
 import { validateStoryForm } from "./utils/validators.js";
 import { registerPushNotification } from "./utils/notifications.js";
 import { showToast } from "./utils/helpers.js";
 import { AuthService } from "./auth.js";
 import { AppError, handleError } from "./errorHandler.js";
-// --- PERBAIKAN: Import CLUSTER_CONFIG dari map.js ---
-import { initMap, renderMarkers, CLUSTER_CONFIG } from "./map.js";
-// --- AKHIR PERBAIKAN ---
+import { initMap, renderMarkers } from "./map.js";
 import { getCapturedPhotoFile, setCapturedPhotoFile } from './view.js';
 import { getStories, storeStory, deleteStoryById } from './db.js';
 
