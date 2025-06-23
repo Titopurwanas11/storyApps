@@ -43,7 +43,6 @@ export class AuthPresenter {
         const password = e.target.password.value;
 
         try {
-            // Logika untuk mengirim data registrasi ke API
             const response = await fetch('https://story-api.dicoding.dev/v1/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
