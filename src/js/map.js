@@ -103,9 +103,9 @@ export const renderMarkers = (map, stories = []) => {
     // --- PERBAIKAN: Popup content dengan syntax yang benar ---
     const popupContent = `
       <div class="popup-content">
-        <h3>${story.name}</h3>
+        <h3>${story.name}</h3> 
         <img src="/storyApps/assets/images/placeholder.webp"
-             data-src="${story.photoUrl}"
+             data-src="${story.photoUrl}" 
              alt="${story.description || 'Story image'}"
              loading="lazy"
              class="story-image"
