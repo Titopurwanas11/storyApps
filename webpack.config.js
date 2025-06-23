@@ -40,6 +40,7 @@ module.exports = {
         { from: path.resolve(__dirname, 'src/assets/icons/marker-icon.webp'), to: 'assets/icons/marker-icon.webp' },
         { from: path.resolve(__dirname, 'src/assets/icons/marker-icon-2x.webp'), to: 'assets/icons/marker-icon-2x.webp' },
         { from: path.resolve(__dirname, 'src/assets/icons/marker-shadow.webp'), to: 'assets/icons/marker-shadow.webp' },
+        { from: path.resolve(__dirname, 'src/assets/images/placeholder.webp'), to: 'assets/images/placeholder.webp' },
 
         // Pola copy untuk semua ikon PWA
         { from: path.resolve(__dirname, 'src/assets/icons/android-chrome-192x192.png'), to: 'assets/icons/android-chrome-192x192.png' },
