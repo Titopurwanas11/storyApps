@@ -1,7 +1,8 @@
 // src/js/sw-register.js
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/storyApps/sw.js', { scope: '/storyApps/' }) 
+
+        navigator.serviceWorker.register('/storyApps/my-service-worker.js', { scope: '/storyApps/' }) 
             .then(registration => {
                 console.log('ServiceWorker registered with scope: ', registration.scope);
             })
