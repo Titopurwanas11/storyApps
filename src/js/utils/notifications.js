@@ -18,13 +18,26 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 async function saveSubscription(subscription) {
+    // --- PERBAIKAN DI SINI ---
+    // Buat objek baru yang hanya berisi properti yang diizinkan oleh API
+    const subscriptionToSend = {
+        endpoint: subscription.endpoint,
+        keys: {
+            p256dh: subscription.toJSON().keys.p256dh,
+            auth: subscription.toJSON().keys.auth
+        }
+        // Pastikan TIDAK MENYERTAKAN 'expirationTime' atau properti lain yang tidak diminta API
+    };
+    // --- AKHIR PERBAIKAN ---
+
     const response = await fetch(`${API_BASE}/notifications/subscribe`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(subscription)
+        // --- Gunakan objek yang sudah disaring ---
+        body: JSON.stringify(subscriptionToSend)
     });
 
     if (!response.ok) {
