@@ -1,1 +1,1 @@
-"serviceWorker"in navigator&&window.addEventListener("load",()=>{navigator.serviceWorker.register("/storyApps/my-service-worker.js",{scope:"/storyApps/"}).then(e=>{console.log("ServiceWorker registered with scope: ",e.scope)}).catch(e=>{console.log("ServiceWorker registration failed: ",e)})});
+"serviceWorker"in navigator&&window.addEventListener("load",()=>{navigator.serviceWorker.register("/storyApps/sw.js").then(e=>{console.log("ServiceWorker registered")}).catch(e=>{console.log("ServiceWorker registration failed: ",e)})});
