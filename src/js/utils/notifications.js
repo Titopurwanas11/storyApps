@@ -7,8 +7,7 @@ export const registerPushNotification = async (description) => {
         if (!('serviceWorker' in navigator)) return;
 
         // Register service worker
-        const registration = await navigator.serviceWorker.register('/sw.js');
-        
+        navigator.serviceWorker.register("/storyApps/sw.js")        
         // Subscribe push notification
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
