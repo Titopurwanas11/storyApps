@@ -51,7 +51,7 @@ function showLocalNotification(description) {
         new Notification('Story Baru', {
             body: description.slice(0, 50) + (description.length > 50 ? '...' : ''),
             // --- PERBAIKAN: Pastikan path icon benar ---
-            icon: '/storyApps/assets/icons/icon-192x192.png'
+            icon: '/storyApps/assets/icons/android-chrome-192x192.png'
         });
     }
 }
