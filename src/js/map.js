@@ -1,5 +1,3 @@
-// src/js/map.js
-
 delete L.Icon.Default.prototype._get;
 
 L.Icon.Default.mergeOptions({
@@ -74,8 +72,7 @@ export const renderMarkers = (map, stories = []) => {
     map.removeLayer(map._markerCluster);
   }
 
-  // --- PERBAIKAN: Pindahkan definisi CLUSTER_CONFIG ke SINI (ke dalam fungsi) ---
-  const CLUSTER_CONFIG = { // <--- DEFINISI DIPINDAHKAN KE DALAM FUNGSI INI
+  const CLUSTER_CONFIG = { // DEFINISI INI SUDAH BENAR DI SINI
     spiderfyOnMaxZoom: true,
     showCoverageOnHover: false,
     zoomToBoundsOnClick: true,
@@ -83,67 +80,65 @@ export const renderMarkers = (map, stories = []) => {
     chunkInterval: 100,
     disableClusteringAtZoom: 17
   };
-  // --- AKHIR PERBAIKAN ---
 
   // Buat marker cluster group
   const markerCluster = L.markerClusterGroup(CLUSTER_CONFIG);
 
   // Tambahkan marker untuk setiap story
   stories.forEach(story => {
-    if (!story.lat || !story.lon) return;
+    if (!story.lat || !story.lon) return;
 
-    const marker = L.marker([story.lat, story.lon], {
-      icon: appCustomMarkerIcon, // <--- GUNAKAN IKON GLOBAL DI SINI!
-      riseOnHover: true,
-      title: story.name,
-      alt: `Lokasi story ${story.name}`,
-      keyboard: true
-    });
+    const marker = L.marker([story.lat, story.lon], {
+      icon: appCustomMarkerIcon,
+      riseOnHover: true,
+      title: story.name,
+      alt: `${story.name}: ${story.description || 'Story image'}`, // Menggunakan alt yang lebih informatif
+      keyboard: true
+    });
 
-    // Popup content dengan lazy loading image
-    const popupContent = `
-      <div class="popup-content">
-        <h3>${story.name}</h3>
-        <img src="/assets/images/placeholder.webp"
-             data-src="${story.photoUrl}"
-             alt="${story.description || 'Story image'}"
-             loading="lazy"
-             class="story-image"
-             width="200"
-             height="150">
-        <p>${story.description}</p>
-        <small>${new Date(story.createdAt).toLocaleDateString()}</small>
-      </div>
-    `;
+    const popupContent = `
+      <div class="popup-content">
+        <h3>${story.name}</h3>
+        <img src="/storyApps/assets/images/placeholder.webp"
+             data-src="${story.photoUrl}"
+             alt="${story.description || 'Story image'}"
+             loading="lazy"
+             class="story-image"
+             width="200"
+             height="150">
+        <p>${story.description}</p>
+        <small>${new Date(story.createdAt).toLocaleDateString()}</small>
+      </div>
+    `;
 
-    marker.bindPopup(popupContent, {
-      maxWidth: 300,
-      minWidth: 200,
-      autoPan: true
-    });
+    marker.bindPopup(popupContent, {
+      maxWidth: 300,
+      minWidth: 200,
+      autoPan: true
+    });
 
-    // Lazy load image saat popup dibuka
-    marker.on('popupopen', () => {
-      const img = document.querySelector('.popup-content img');
-      if (img && img.dataset.src) {
-        img.src = img.dataset.src;
-      }
-    });
+    // Lazy load image saat popup dibuka
+    marker.on('popupopen', () => {
+      const img = document.querySelector('.popup-content img');
+      if (img && img.dataset.src) {
+        img.src = img.dataset.src;
+      }
+    });
 
-    markerCluster.addLayer(marker);
-  });
+    markerCluster.addLayer(marker);
+  });
 
-  // Tambahkan cluster ke peta
-  map.addLayer(markerCluster);
-  map._markerCluster = markerCluster;
+  // Tambahkan cluster ke peta
+  map.addLayer(markerCluster);
+  map._markerCluster = markerCluster;
 
-  // Fit bounds jika ada marker
-  if (stories.some(s => s.lat && s.lon)) {
-    const bounds = markerCluster.getBounds();
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-    }
-  }
+  // Fit bounds jika ada marker
+  if (stories.some(s => s.lat && s.lon)) {
+    const bounds = markerCluster.getBounds();
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+  }
 };
 
 // Fungsi untuk menangani klik peta (ambil koordinat)
