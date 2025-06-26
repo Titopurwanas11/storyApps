@@ -32,7 +32,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: path.resolve(__dirname, 'src/offline.html'), to: 'offline.html' },
-        { from: path.resolve(__dirname, 'src/js/sw-register.js'), to: 'js/sw-register.js' },
+        { from: path.resolve(__dirname, 'src/js/my-sw-register.js'), to: 'js/my-sw-register.js' },
 
         { from: path.resolve(__dirname, 'src/manifest.json'), to: 'manifest.json' },
 
