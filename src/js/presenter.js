@@ -171,7 +171,7 @@ export class StoriesPresenter {
             } else {
                 location.hash = "#/stories";
             }
-            // await registerPushNotification(description); // <-- PERBAIKAN: Aktifkan ini nanti
+             await registerPushNotification(description); 
         } catch (error) {
             console.error("Gagal menambahkan story:", error);
             showToast(`Gagal: ${error.message}`, "error");
