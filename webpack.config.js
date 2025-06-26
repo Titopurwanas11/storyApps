@@ -32,7 +32,6 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: path.resolve(__dirname, 'src/offline.html'), to: 'offline.html' },
-        { from: path.resolve(__dirname, 'src/my-service-worker.js'), to: 'my-service-worker.js' },
         { from: path.resolve(__dirname, 'src/js/sw-register.js'), to: 'js/sw-register.js' },
 
         { from: path.resolve(__dirname, 'src/manifest.json'), to: 'manifest.json' },
@@ -55,8 +54,8 @@ module.exports = {
 
     // --- PERBAIKAN: Tambahkan InjectManifest plugin ---
     new InjectManifest({
-      swSrc: path.resolve(__dirname, 'src/my-service-worker.js'), // <-- UBAH DI SINI
-      swDest: 'my-service-worker.js', // <-- UBAH DI SINI
+      swSrc: path.resolve(__dirname, 'src/sw.js'), // <-- UBAH DI SINI
+      swDest: 'sw.js', // <-- UBAH DI SINI
     }),
   ],
 
