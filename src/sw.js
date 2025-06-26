@@ -1,5 +1,3 @@
-// src/sw.js
-
 import { precacheAndRoute } from 'workbox-precaching';
 
 const CACHE_VERSION = 'v3';
@@ -24,13 +22,14 @@ const CORE_ASSETS = [
 ];
 
 // Map Resources - CDN tetap sama, tapi errorTileUrl harus diperbaiki
-// src/sw.js
 const MAP_RESOURCES = [
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js',
+  // HAPUS INI JIKA ANDA TIDAK MENGGUNAKANNYA ATAU JIKA MENYEBABKAN 404
+  // 'https://unpkg.com/leaflet.lazyload@1.0.0/Leaflet.LazyLoad.min.js',
   'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  '/storyApps/assets/images/map-error.webp'
+  '/storyApps/assets/images/map-error.webp' // <-- PERBAIKAN
 ];
 
 precacheAndRoute(self.__WB_MANIFEST);

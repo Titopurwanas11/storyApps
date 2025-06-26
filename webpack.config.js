@@ -54,11 +54,10 @@ module.exports = {
 
     // --- PERBAIKAN: Tambahkan InjectManifest plugin ---
     new InjectManifest({
-      swSrc: path.resolve(__dirname, 'src/sw.js'), // Sumber Service Worker Anda
-      swDest: 'sw.js', // Nama file Service Worker output di folder dist/
-    }),
-    // --- AKHIR PERBAIKAN ---
-  ],
+      swSrc: path.resolve(__dirname, 'src/sw.js'), // <-- UBAH DI SINI
+      swDest: 'sw.js', // <-- UBAH DI SINI
+    }),
+  ],
 
   devServer: {
     static: { directory: path.resolve(__dirname, 'dist') },

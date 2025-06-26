@@ -148,80 +148,80 @@ export const renderMarkers = (map, stories = []) => {
 
 // Fungsi untuk menangani klik peta (ambil koordinat)
 export const setupMapClickHandler = (map, callback) => {
-  if (!map) return;
+  if (!map) return;
 
-  let marker = null;
-  const clickHandler = (e) => {
-    const { lat, lng } = e.latlng;
+  let marker = null;
+  const clickHandler = (e) => {
+    const { lat, lng } = e.latlng;
 
-    // Hapus marker sebelumnya
-    if (marker) {
-      map.removeLayer(marker);
-    }
+    if (marker) {
+      map.removeLayer(marker);
+    }
 
-  
-    // Tambahkan marker baru
-    marker = L.marker([lat, lng], {
-      icon: appCustomMarkerIcon, // <--- GUNAKAN IKON GLOBAL DI SINI!
-      draggable: true,
-      title: 'Lokasi dipilih',
-      alt: 'Marker lokasi story'
-    }).addTo(map);
+  
+    // Tambahkan marker baru
+    marker = L.marker([lat, lng], {
+      icon: appCustomMarkerIcon,
+      draggable: true,
+      title: 'Lokasi dipilih',
+      alt: `Lokasi dipilih: Lat ${lat.toFixed(4)}, Lon ${lng.toFixed(4)}`, // <-- PERBAIKAN DI SINI! (Alt attribute tanpa 'story')
+      keyboard: true
+    }).addTo(map);
 
-    // Panggil callback dengan koordinat
-    callback(lat, lng);
+    // Panggil callback dengan koordinat
+    callback(lat, lng);
 
-    // Handle marker drag
-    marker.on('dragend', (e) => {
-      const newPos = e.target.getLatLng();
-      callback(newPos.lat, newPos.lng);
-    });
-  };
+    // Handle marker drag
+    marker.on('dragend', (e) => {
+      const newPos = e.target.getLatLng();
+      callback(newPos.lat, newPos.lng);
+    });
+  };
 
-  map.on('click', clickHandler);
+  map.on('click', clickHandler);
 
-  // Fungsi cleanup
-  return () => {
-    map.off('click', clickHandler);
-    if (marker) map.removeLayer(marker);
-  };
+  // Fungsi cleanup
+  return () => {
+    map.off('click', clickHandler);
+    if (marker) map.removeLayer(marker);
+  };
 };
 
 // Fungsi untuk update lokasi user
 export const locateUser = (map) => {
-  return new Promise((resolve, reject) => {
-    if (!map) return reject('Map not initialized');
+  return new Promise((resolve, reject) => {
+    if (!map) return reject('Map not initialized');
 
-    map.locate({
-      setView: true,
-      maxZoom: 16,
-      enableHighAccuracy: true,
-      timeout: 10000
-    })
-      .on('locationfound', (e) => {
-        const { lat, lng } = e.latlng;
-        L.marker([lat, lng], {
-          icon: appCustomMarkerIcon, // <-- Tambahkan ikon ini juga untuk marker lokasi user
-          title: 'Lokasi Anda',
-          alt: 'Marker lokasi user'
-        }).addTo(map)
-          .bindPopup('Anda berada di sini')
-          .openPopup();
+    map.locate({
+      setView: true,
+      maxZoom: 16,
+      enableHighAccuracy: true,
+      timeout: 10000
+    })
+      .on('locationfound', (e) => {
+        const { lat, lng } = e.latlng;
+        L.marker([lat, lng], {
+          icon: appCustomMarkerIcon,
+          title: 'Lokasi Anda',
+          alt: 'Marker lokasi user'
+        }).addTo(map)
+          .bindPopup('Anda berada di sini')
+          .openPopup();
 
-        resolve({ lat, lng });
-      })
-      .on('locationerror', (err) => {
-        console.error('Geolocation error:', err.message);
-        reject(err.message);
-      });
-  });
+        resolve({ lat, lng });
+      })
+      .on('locationerror', (err) => {
+        console.error('Geolocation error:', err.message);
+        reject(err.message);
+      });
+  });
 };
 
 // Cleanup peta
 export const cleanupMap = (containerId) => {
-  const container = document.getElementById(containerId);
-  if (container && container._map) {
-    container._map.remove();
-    delete container._map;
-  }
+  const container = document.getElementById(containerId);
+  if (container && container._map) {
+    container._map.remove();
+    delete container._map;
+  }
 };
